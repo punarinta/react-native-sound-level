@@ -23,6 +23,20 @@ On *Android* you need to add a permission to `AndroidManifest.xml`:
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
 ```
 
+### Manual installation on iOS
+```
+In XCode, in the project navigator:
+
+* Right click _Libraries_
+* Add Files to _[your project's name]_
+* Go to `node_modules/react-native-sound-level`
+* Add the `.xcodeproj` file
+
+In XCode, in the project navigator, select your project.
+
+* Add the `libRNSoundLevel.a` from the _soundlevel_ project to your project's _Build Phases ➜ Link Binary With Libraries_
+```
+
 
 ### Usage
 
