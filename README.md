@@ -40,12 +40,13 @@ In XCode, in the project navigator, select your project.
 
 ### Usage
 
-```
+```js
 import RNSoundLevel from 'react-native-sound-level'
 
 componentDidMount() {
   RNSoundLevel.start()
   RNSoundLevel.onNewFrame = (data) => {
+    // see "Returned data" section below
     console.log('Sound level info', data)
   }
 }
@@ -53,5 +54,14 @@ componentDidMount() {
 // don't forget to stop it
 componentWillUnmount() {
   RNSoundLevel.stop()
+}
+```
+
+### Returned data
+```
+{
+  "id",             // frame number
+  "value",          // sound level in decibels, -160 is a silence level
+  "rawValue"        // raw level value, OS-dependent
 }
 ```
