@@ -1,24 +1,36 @@
 'use strict';
 
-import { NativeModules, NativeAppEventEmitter } from "react-native";
+import { NativeModules, NativeAppEventEmitter, Platform } from "react-native";
 
-var SoundLevelModule = NativeModules.RNSoundLevelModule;
+var SoundLevelModule = Platform.OS === 'desktop' ? NativeModules.RNSoundLevel : NativeModules.RNSoundLevelModule;
 
 var SoundLevel = {
+  timer: null,
   start: function() {
     if (this.frameSubscription) this.frameSubscription.remove();
-    this.frameSubscription = NativeAppEventEmitter.addListener('frame',
-      (data) => {
+
+    if (Platform.OS === 'desktop') {
+      this.timer = setInterval(async () => {
         if (this.onNewFrame) {
-          this.onNewFrame(data);
+          const frame = await SoundLevelModule.measure()
+          this.onNewFrame(JSON.parse(frame));
         }
-      }
-    );
+      }, 250)
+    } else {
+      this.frameSubscription = NativeAppEventEmitter.addListener('frame',
+        (data) => {
+          if (this.onNewFrame) {
+            this.onNewFrame(data);
+          }
+        }
+      );
+    }
 
     return SoundLevelModule.start();
   },
   stop: function() {
     if (this.frameSubscription) this.frameSubscription.remove();
+    if (this.timer) clearInterval(this.timer);
     return SoundLevelModule.stop();
   },
 };
