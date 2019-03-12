@@ -21,7 +21,7 @@ var SoundLevel = {
           const frame = await SoundLevelModule.measure()
           this.onNewFrame(JSON.parse(frame))
         }
-      }, 250)
+      }, monitorInterval)
     } else {
       this.frameSubscription = NativeAppEventEmitter.addListener(
         'frame',
