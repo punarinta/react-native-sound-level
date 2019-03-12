@@ -53,8 +53,8 @@ RCT_EXPORT_MODULE();
   [_progressUpdateTimer invalidate];
 }
 
-- (void)startProgressTimer {
-  _progressUpdateInterval = 250;
+- (void)startProgressTimer:(int)monitorInterval {
+  _progressUpdateInterval = monitorInterval;
 
   [self stopProgressTimer];
 
@@ -62,8 +62,9 @@ RCT_EXPORT_MODULE();
   [_progressUpdateTimer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
-RCT_EXPORT_METHOD(start)
+RCT_EXPORT_METHOD(start:(int)monitorInterval)
 {
+  NSLog(@"Start Monitoring");
   _prevProgressUpdateTime = nil;
   [self stopProgressTimer];
 
@@ -93,10 +94,10 @@ RCT_EXPORT_METHOD(start)
     } else {
       [_audioRecorder prepareToRecord];
   }
-    
+
   _audioRecorder.meteringEnabled = YES;
 
-  [self startProgressTimer];
+  [self startProgressTimer:monitorInterval];
   [_recordSession setActive:YES error:nil];
   [_audioRecorder record];
 }
