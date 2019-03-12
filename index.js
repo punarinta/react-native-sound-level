@@ -9,8 +9,11 @@ var SoundLevelModule =
 
 var SoundLevel = {
   timer: null,
-  start: function (monitorInterval) {
-    if (this.frameSubscription) this.frameSubscription.remove()
+
+  start: function (monitorInterval = 250) {
+    if (this.frameSubscription) {
+      this.frameSubscription.remove()
+    }
 
     if (Platform.OS === 'desktop') {
       this.timer = setInterval(async () => {
@@ -30,11 +33,19 @@ var SoundLevel = {
       )
     }
 
-    return SoundLevelModule.start(monitorInterval)
+    // Monitoring interval not supported for Android yet. Feel free to add and do a pull request. :)
+    return Platform.OS === 'ios' ? SoundLevelModule.start(monitorInterval) : SoundLevelModule.start()
   },
+
   stop: function () {
-    if (this.frameSubscription) this.frameSubscription.remove()
-    if (this.timer) clearInterval(this.timer)
+    if (this.frameSubscription) {
+      this.frameSubscription.remove()
+    }
+
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+
     return SoundLevelModule.stop()
   }
 }
