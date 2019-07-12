@@ -1,9 +1,9 @@
 {
-  "name": "react-native-sound-level",
+  "name": "react-native-mic-level",
   "version": "1.1.0",
-  "description": "A package to dynamically measure microphone input level",
+  "description": "Measure MIC input level. Fork of https://github.com/punarinta/react-native-sound-level",
   "main": "index.js",
-  "author": "Vladimir Osipov (https://github.com/punarinta)",
+  "author": "Yasith Jayawardana",
   "files": [
     "README.md",
     "LICENSE",
@@ -23,11 +23,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:punarinta/react-native-sound-level.git"
+    "url": "git@github.com:yasithmilinda/react-native-sound-level.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/punarinta/react-native-sound-level/issues"
+    "url": "https://github.com/yasithmilinda/react-native-sound-level/issues"
   },
   "nativePackage": true
 }
