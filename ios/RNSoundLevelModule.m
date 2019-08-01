@@ -6,11 +6,30 @@
 //  Copyright (c) 2018 Vladimir Osipov. All rights reserved.
 //
 
-#import "RNSoundLevelModule.h"
+#if __has_include("RCTConvert.h")
+#import "RCTConvert.h"
+#else
 #import <React/RCTConvert.h>
+#endif
+
+#if __has_include("RCTBridge.h")
+#import "RCTBridge.h"
+#else
 #import <React/RCTBridge.h>
+#endif
+
+#if __has_include("RCTUtils.h")
+#import "RCTUtils.h"
+#else
 #import <React/RCTUtils.h>
+#endif
+
+#if __has_include("RCTEventDispatcher.h")
+#import "RCTEventDispatcher.h"
+#else
 #import <React/RCTEventDispatcher.h>
+#endif
+
 #import <AVFoundation/AVFoundation.h>
 
 @implementation RNSoundLevelModule {
