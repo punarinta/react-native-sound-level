@@ -45,7 +45,7 @@ In XCode, in the project navigator, select your project.
 
 ### React Native 0.60+
 To make it run correctly on iOS you may need the following:
-1. Add `'react-native-sound-level', :podspec => '../node_modules/react-native-sound-level/RNSoundLevel.podspec'` to your `ios/Podfile` file.
+1. Add `pod 'react-native-sound-level', :podspec => '../node_modules/react-native-sound-level/RNSoundLevel.podspec'` to your `ios/Podfile` file.
 2. Unlink the library if linked before (`react-native unlink react-native-sound-level`).
 3. Run `pod install` from within your project `ios` directory
 
