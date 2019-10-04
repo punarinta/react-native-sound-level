@@ -4,6 +4,7 @@
   "description": "A package to dynamically measure microphone input level",
   "main": "index.js",
   "author": "Vladimir Osipov (https://github.com/punarinta)",
+  "homepage": "https://github.com/punarinta/react-native-sound-level",
   "files": [
     "README.md",
     "LICENSE",
