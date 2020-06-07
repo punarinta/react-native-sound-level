@@ -38,7 +38,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void start(Promise promise) {
+  public void start(int monitorInterval, Promise promise) {
     if (isRecording) {
       logAndRejectPromise(promise, "INVALID_STATE", "Please call stop before starting");
       return;
@@ -69,7 +69,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
 
     frameId = 0;
     isRecording = true;
-    startTimer();
+    startTimer(monitorInterval);
     promise.resolve(true);
   }
 
@@ -98,7 +98,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
     promise.resolve(true);
   }
 
-  private void startTimer() {
+  private void startTimer(int monitorInterval) {
     timer = new Timer();
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
@@ -118,7 +118,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
 
           sendEvent("frame", body);
       }
-    }, 0, 250);
+    }, 0, monitorInterval);
   }
 
   private void stopTimer() {
