@@ -56,6 +56,7 @@ To make it run correctly on iOS you may need the following:
 import RNSoundLevel from 'react-native-sound-level'
 
 componentDidMount() {
+  // Its worth noting here that you can pass a number into `start()` to determin the sample rate. 
   RNSoundLevel.start()
   RNSoundLevel.onNewFrame = (data) => {
     // see "Returned data" section below
