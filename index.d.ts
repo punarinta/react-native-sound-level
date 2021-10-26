@@ -21,7 +21,7 @@ export type SoundLevelType = {
   /**
    * @description monitoringInterval works only for iOS
    */
-  start: (monitoringInterval) => Promise<void>;
+  start: (monitoringInterval?: number) => void;
   stop: () => void;
   onNewFrame: (result: SoundLevelResultType) => void;
 }

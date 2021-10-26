@@ -1,6 +1,6 @@
 {
   "name": "react-native-sound-level",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "A package to dynamically measure microphone input level",
   "main": "index.js",
   "author": "Vladimir Osipov (https://github.com/punarinta)",
