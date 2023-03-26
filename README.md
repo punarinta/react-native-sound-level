@@ -51,13 +51,26 @@ To make it run correctly on iOS you may need the following:
 
 ### Usage
 
+1. Request permission to access microphone, handle the UI by yourself.
+You may use [react-native-permissions](https://www.npmjs.com/package/react-native-permissions) package or simply
+[PermissionsAndroid](https://reactnative.dev/docs/permissionsandroid) module.
+2. Configure the monitor and start it.
+3. Makes sense to stop it when not used.
+
 ```ts
 import RNSoundLevel from 'react-native-sound-level'
 
 const MONITOR_INTERVAL = 250 // in ms
 
+const requestPermission = async () => {
+  // request permission to access microphone
+  // ...
+  if (success) {
+    RNSoundLevel.start(MONITOR_INTERVAL)
+  }
+}
+
 useEffect(() => {
-  RNSoundLevel.start(MONITOR_INTERVAL)
   RNSoundLevel.onNewFrame = (data) => {
     // see "Returned data" section below
     console.log('Sound level info', data)
