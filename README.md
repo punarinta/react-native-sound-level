@@ -6,8 +6,7 @@ Can be used to help user to adjust microphone sensitivity.
 Install the npm package and link it to your project:
 
 ```
-npm install react-native-sound-level --save
-react-native link react-native-sound-level
+npm i react-native-sound-level --save
 ```
 
 On *iOS* you need to add a usage description to `Info.plist`:
@@ -52,22 +51,24 @@ To make it run correctly on iOS you may need the following:
 
 ### Usage
 
-```js
+```ts
 import RNSoundLevel from 'react-native-sound-level'
 
-componentDidMount() {
-  // Its worth noting here that you can pass a number into `start()` to determin the sample rate. 
-  RNSoundLevel.start()
+const MONITOR_INTERVAL = 250 // in ms
+
+useEffect(() => {
+  RNSoundLevel.start(MONITOR_INTERVAL)
   RNSoundLevel.onNewFrame = (data) => {
     // see "Returned data" section below
     console.log('Sound level info', data)
   }
-}
+  
+  return () => {
+    // don't forget to stop it
+    RNSoundLevel.stop()
+  }
+}, [])
 
-// don't forget to stop it
-componentWillUnmount() {
-  RNSoundLevel.stop()
-}
 ```
 
 ### Returned data
