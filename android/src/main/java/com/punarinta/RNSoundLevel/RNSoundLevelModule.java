@@ -55,7 +55,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
       recorder.setOutputFile(this.getReactApplicationContext().getCacheDir().getAbsolutePath() + "/soundlevel");
     }
     catch(final Exception e) {
-      logAndRejectPromise(promise, "COULDNT_CONFIGURE_MEDIA_RECORDER" , "Make sure you've added RECORD_AUDIO permission to your AndroidManifest.xml file " + e.getMessage());
+      logAndRejectPromise(promise, "COULDNT_CONFIGURE_MEDIA_RECORDER" , "Make sure: android.permission.RECORD_AUDIO is added to AndroidManifest.xml, user permission to use the microphone is acquired. " + e.getMessage());
       return;
     }
 
