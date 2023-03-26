@@ -1,4 +1,3 @@
-import { NativeAppEventEmitter } from 'react-native'
 export type SoundLevelResultType = {
   /**
    * @description Frame number
@@ -19,7 +18,7 @@ export type SoundLevelResultType = {
 
 export type SoundLevelType = {
   /**
-   * @description monitoringInterval works only for iOS
+   * @description monitoringInterval is not supported for desktop yet
    */
   start: (monitoringInterval?: number) => void;
   stop: () => void;

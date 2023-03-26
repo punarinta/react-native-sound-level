@@ -9,6 +9,7 @@
     "README.md",
     "LICENSE",
     "index.js",
+    "index.d.ts",
     "RNSoundLevel.podspec",
     "android/*",
     "ios/RNSoundLevelModule.m",
