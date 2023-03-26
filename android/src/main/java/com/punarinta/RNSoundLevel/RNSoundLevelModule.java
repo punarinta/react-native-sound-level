@@ -38,7 +38,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void start(int monitorInterval, Promise promise) {
+  public void start(int monitorInterval, int samplingRate, Promise promise) {
     if (isRecording) {
       logAndRejectPromise(promise, "INVALID_STATE", "Please call stop before starting");
       return;
@@ -49,7 +49,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
       recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
       recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
       recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-      recorder.setAudioSamplingRate(22050);
+      recorder.setAudioSamplingRate(samplingRate);
       recorder.setAudioChannels(1);
       recorder.setAudioEncodingBitRate(32000);
       recorder.setOutputFile(this.getReactApplicationContext().getCacheDir().getAbsolutePath() + "/soundlevel");

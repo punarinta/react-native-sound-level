@@ -1,4 +1,4 @@
-export type SoundLevelResultType = {
+export type SoundLevelResult = {
   /**
    * @description Frame number
    */
@@ -16,13 +16,18 @@ export type SoundLevelResultType = {
   rawValue: number;
 }
 
+export type SoundLevelMonitorConfig = {
+  monitoringInterval?: number
+  samplingRate?: number
+}
+
 export type SoundLevelType = {
   /**
    * @description monitoringInterval is not supported for desktop yet
    */
-  start: (monitoringInterval?: number) => void;
+  start: (config?: number | SoundLevelMonitorConfig) => void;
   stop: () => void;
-  onNewFrame: (result: SoundLevelResultType) => void;
+  onNewFrame: (result: SoundLevelResult) => void;
 }
 
 declare const SoundLevel: SoundLevelType;

@@ -10,7 +10,16 @@ var SoundLevelModule =
 var SoundLevel = {
   timer: null,
 
-  start: function (monitorInterval = 250) {
+  start: function (_monitorConfig = 250) {
+    const monitorConfig = {
+      monitorInterval: 250,
+      samplingRate: 22050,
+    }
+
+    if (typeof _monitorConfig === 'number') {
+      monitorConfig.monitorInterval = _monitorConfig
+    }
+
     if (this.frameSubscription) {
       this.frameSubscription.remove()
     }
@@ -21,7 +30,7 @@ var SoundLevel = {
           const frame = await SoundLevelModule.measure()
           this.onNewFrame(JSON.parse(frame))
         }
-      }, monitorInterval)
+      }, monitorConfig.monitorInterval)
     } else {
       this.frameSubscription = NativeAppEventEmitter.addListener(
         'frame',
@@ -33,8 +42,8 @@ var SoundLevel = {
       )
     }
 
-    // Monitoring interval not supported for Desktop yet. Feel free to add and do a pull request. :)
-    return Platform.OS !== 'desktop' ? SoundLevelModule.start(monitorInterval) : SoundLevelModule.start()
+    // Monitoring interval not supported for Android yet. Feel free to add and do a pull request. :)
+    return Platform.OS !== 'desktop' ? SoundLevelModule.start(monitorConfig.monitorInterval, monitorConfig.samplingRate) : SoundLevelModule.start()
   },
 
   stop: function () {

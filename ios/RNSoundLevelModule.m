@@ -62,7 +62,7 @@ RCT_EXPORT_MODULE();
   [_progressUpdateTimer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
-RCT_EXPORT_METHOD(start:(int)monitorInterval)
+RCT_EXPORT_METHOD(start:(int)monitorInterval samplingRate:(float)sampleRate)
 {
   NSLog(@"Start Monitoring");
   _prevProgressUpdateTime = nil;
@@ -72,7 +72,7 @@ RCT_EXPORT_METHOD(start:(int)monitorInterval)
           [NSNumber numberWithInt:AVAudioQualityLow], AVEncoderAudioQualityKey,
           [NSNumber numberWithInt:kAudioFormatMPEG4AAC], AVFormatIDKey,
           [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
-          [NSNumber numberWithFloat:22050.0], AVSampleRateKey,
+          [NSNumber numberWithFloat:samplingRate], AVSampleRateKey,
           nil];
 
   NSError *error = nil;
