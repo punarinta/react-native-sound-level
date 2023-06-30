@@ -62,7 +62,7 @@ RCT_EXPORT_MODULE();
   [_progressUpdateTimer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
-RCT_EXPORT_METHOD(start:(int)monitorInterval samplingRate:(float)sampleRate)
+RCT_EXPORT_METHOD(start:(int)monitorInterval samplingRate:(float)sampleRate allowHapticsAndSystemSoundsDuringRecording:(BOOL)allow)
 {
   NSLog(@"Start Monitoring");
   _prevProgressUpdateTime = nil;
@@ -72,7 +72,7 @@ RCT_EXPORT_METHOD(start:(int)monitorInterval samplingRate:(float)sampleRate)
           [NSNumber numberWithInt:AVAudioQualityLow], AVEncoderAudioQualityKey,
           [NSNumber numberWithInt:kAudioFormatMPEG4AAC], AVFormatIDKey,
           [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
-          [NSNumber numberWithFloat:samplingRate], AVSampleRateKey,
+          [NSNumber numberWithFloat:sampleRate], AVSampleRateKey,
           nil];
 
   NSError *error = nil;
@@ -98,6 +98,11 @@ RCT_EXPORT_METHOD(start:(int)monitorInterval samplingRate:(float)sampleRate)
   _audioRecorder.meteringEnabled = YES;
 
   [self startProgressTimer:monitorInterval];
+  // Allow Haptic and System sound during recording
+  // https://developer.apple.com/documentation/avfaudio/avaudiosession/3240575-allowhapticsandsystemsoundsdurin?language=objc
+  if (@available(iOS 13.0, *)) {
+      [_recordSession setAllowHapticsAndSystemSoundsDuringRecording:allow error:nil];
+  }
   [_recordSession setActive:YES error:nil];
   [_audioRecorder record];
 }
