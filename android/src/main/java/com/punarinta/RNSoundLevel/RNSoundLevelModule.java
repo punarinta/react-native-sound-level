@@ -142,7 +142,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
   }
 
   private void logAndRejectPromise(Promise promise, String errorCode, String errorMessage) {
-    Log.e(TAG, errorMessage);
+    Log.e(TAG, "[" + errorCode + "] " + errorMessage);
     promise.reject(errorCode, errorMessage);
   }
 }
