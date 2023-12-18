@@ -63,9 +63,15 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
       recorder.prepare();
     } catch (final Exception e) {
       logAndRejectPromise(promise, "COULDNT_PREPARE_RECORDING", e.getMessage());
+      return;
     }
 
-    recorder.start();
+    try {
+      recorder.start();
+    } catch (final Exception e) {
+      logAndRejectPromise(promise, "COULDNT_START_RECORDING", e.getMessage());
+      return;
+    }
 
     frameId = 0;
     isRecording = true;
@@ -136,7 +142,7 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
   }
 
   private void logAndRejectPromise(Promise promise, String errorCode, String errorMessage) {
-    Log.e(TAG, errorMessage);
+    Log.e(TAG, "[" + errorCode + "] " + errorMessage);
     promise.reject(errorCode, errorMessage);
   }
 }
