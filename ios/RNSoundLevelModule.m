@@ -72,7 +72,7 @@ RCT_EXPORT_METHOD(start:(int)monitorInterval samplingRate:(float)sampleRate)
           [NSNumber numberWithInt:AVAudioQualityLow], AVEncoderAudioQualityKey,
           [NSNumber numberWithInt:kAudioFormatMPEG4AAC], AVFormatIDKey,
           [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
-          [NSNumber numberWithFloat:samplingRate], AVSampleRateKey,
+          [NSNumber numberWithFloat:sampleRate], AVSampleRateKey,
           nil];
 
   NSError *error = nil;
