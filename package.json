@@ -26,7 +26,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:punarinta/react-native-sound-level.git"
+    "url": "git+ssh://git@github.com/punarinta/react-native-sound-level.git"
   },
   "license": "MIT",
   "bugs": {
