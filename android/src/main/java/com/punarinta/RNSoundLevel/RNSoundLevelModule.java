@@ -1,7 +1,5 @@
 package com.punarinta.RNSoundLevel;
 
-import android.content.Context;
-
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -10,6 +8,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,15 +20,14 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
 
   private static final String TAG = "RNSoundLevel";
 
-  private Context context;
   private MediaRecorder recorder;
+  private File outputFile;
   private boolean isRecording = false;
   private Timer timer;
   private int frameId = 0;
 
   public RNSoundLevelModule(ReactApplicationContext reactContext) {
     super(reactContext);
-    this.context = reactContext;
   }
 
   @Override
@@ -39,69 +37,113 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void start(int monitorInterval, int samplingRate, Promise promise) {
-    if (isRecording) {
-      logAndRejectPromise(promise, "INVALID_STATE", "Please call stop before starting");
-      return;
+    synchronized (this) {
+      if (isRecording) {
+        logAndRejectPromise(promise, "INVALID_STATE", "Please call stop before starting");
+        return;
+      }
+
+      recorder = new MediaRecorder();
+      try {
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        recorder.setAudioSamplingRate(samplingRate);
+        recorder.setAudioChannels(1);
+        recorder.setAudioEncodingBitRate(32000);
+        // The recording itself is never used, only the amplitude is metered,
+        // but the MPEG_4 muxer needs a real, seekable file. It is removed
+        // in stop() and any stale one is replaced here.
+        outputFile = new File(this.getReactApplicationContext().getCacheDir(), "rnsoundlevel.tmp");
+        if (outputFile.exists()) {
+          outputFile.delete();
+        }
+        recorder.setOutputFile(outputFile.getAbsolutePath());
+      }
+      catch(final Exception e) {
+        releaseFailedRecorder();
+        logAndRejectPromise(promise, "COULDNT_CONFIGURE_MEDIA_RECORDER" , "Make sure: android.permission.RECORD_AUDIO is added to AndroidManifest.xml, user permission to use the microphone is acquired. " + e.getMessage());
+        return;
+      }
+
+      try {
+        recorder.prepare();
+      } catch (final Exception e) {
+        releaseFailedRecorder();
+        logAndRejectPromise(promise, "COULDNT_PREPARE_RECORDING", e.getMessage());
+        return;
+      }
+
+      try {
+        recorder.start();
+      } catch (final Exception e) {
+        releaseFailedRecorder();
+        logAndRejectPromise(promise, "COULDNT_START_RECORDING", e.getMessage());
+        return;
+      }
+
+      frameId = 0;
+      isRecording = true;
     }
 
-    recorder = new MediaRecorder();
-    try {
-      recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-      recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-      recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-      recorder.setAudioSamplingRate(samplingRate);
-      recorder.setAudioChannels(1);
-      recorder.setAudioEncodingBitRate(32000);
-      recorder.setOutputFile(this.getReactApplicationContext().getCacheDir().getAbsolutePath() + "/soundlevel");
-    }
-    catch(final Exception e) {
-      logAndRejectPromise(promise, "COULDNT_CONFIGURE_MEDIA_RECORDER" , "Make sure: android.permission.RECORD_AUDIO is added to AndroidManifest.xml, user permission to use the microphone is acquired. " + e.getMessage());
-      return;
-    }
-
-    try {
-      recorder.prepare();
-    } catch (final Exception e) {
-      logAndRejectPromise(promise, "COULDNT_PREPARE_RECORDING", e.getMessage());
-      return;
-    }
-
-    try {
-      recorder.start();
-    } catch (final Exception e) {
-      logAndRejectPromise(promise, "COULDNT_START_RECORDING", e.getMessage());
-      return;
-    }
-
-    frameId = 0;
-    isRecording = true;
     startTimer(monitorInterval);
     promise.resolve(true);
   }
 
   @ReactMethod
   public void stop(Promise promise) {
-    if (!isRecording) {
-      logAndRejectPromise(promise, "INVALID_STATE", "Please call start before stopping recording");
-      return;
-    }
-
     stopTimer();
-    isRecording = false;
 
-    try {
-      recorder.stop();
-      recorder.release();
-    }
-    catch (final RuntimeException e) {
-      logAndRejectPromise(promise, "RUNTIME_EXCEPTION", "No valid audio data received. You may be using a device that can't record audio.");
-      return;
-    }
-    finally {
-      recorder = null;
+    synchronized (this) {
+      if (!isRecording) {
+        logAndRejectPromise(promise, "INVALID_STATE", "Please call start before stopping recording");
+        return;
+      }
+
+      isRecording = false;
+
+      try {
+        recorder.stop();
+        recorder.release();
+      }
+      catch (final RuntimeException e) {
+        logAndRejectPromise(promise, "RUNTIME_EXCEPTION", "No valid audio data received. You may be using a device that can't record audio.");
+        return;
+      }
+      finally {
+        recorder = null;
+        if (outputFile != null) {
+          outputFile.delete();
+          outputFile = null;
+        }
+      }
     }
 
     promise.resolve(true);
+  }
+
+  @ReactMethod
+  public void addListener(String eventName) {
+    // Required by NativeEventEmitter, no-op
+  }
+
+  @ReactMethod
+  public void removeListeners(double count) {
+    // Required by NativeEventEmitter, no-op
+  }
+
+  private void releaseFailedRecorder() {
+    try {
+      recorder.release();
+    } catch (final Exception ignored) {
+    }
+
+    recorder = null;
+
+    if (outputFile != null) {
+      outputFile.delete();
+      outputFile = null;
+    }
   }
 
   private void startTimer(int monitorInterval) {
@@ -109,20 +151,32 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
+        int amplitude;
 
-          WritableMap body = Arguments.createMap();
-          body.putDouble("id", frameId++);
-
-          int amplitude = recorder.getMaxAmplitude();
-          if (amplitude == 0) {
-            body.putInt("value", -160);
-            body.putInt("rawValue", 0);
-          } else {
-            body.putInt("rawValue", amplitude);
-            body.putInt("value", (int) (20 * Math.log(((double) amplitude) / 32767d)));
+        synchronized (RNSoundLevelModule.this) {
+          if (!isRecording || recorder == null) {
+            return;
           }
 
-          sendEvent("frame", body);
+          try {
+            amplitude = recorder.getMaxAmplitude();
+          } catch (final IllegalStateException e) {
+            return;
+          }
+        }
+
+        WritableMap body = Arguments.createMap();
+        body.putDouble("id", frameId++);
+
+        if (amplitude == 0) {
+          body.putInt("value", -160);
+          body.putInt("rawValue", 0);
+        } else {
+          body.putInt("rawValue", amplitude);
+          body.putInt("value", (int) (20 * Math.log10(((double) amplitude) / 32767d)));
+        }
+
+        sendEvent("frame", body);
       }
     }, 0, monitorInterval);
   }
